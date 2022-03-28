@@ -36,6 +36,8 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HistoryWorkSaver\HistoryWorkSaver.csproj" />
+    <ProjectReference Include="..\PubSub\PubSub.csproj" />
     <ProjectReference Include="..\WebClient\WebClient.csproj">
       <ServiceLaunchUrl>http://localhost:{ServicePort}/</ServiceLaunchUrl>
     </ProjectReference>

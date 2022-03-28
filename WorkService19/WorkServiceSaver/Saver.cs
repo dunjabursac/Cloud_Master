@@ -66,12 +66,37 @@ namespace WorkServiceSaver
                 var enumerator = (await CurrentWorkDict.CreateEnumerableAsync(tx)).GetAsyncEnumerator();
                 while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
                 {
-                    await CurrentWorkDict.TryRemoveAsync(tx, enumerator.Current.Key);
+                    if (enumerator.Current.Value.EndDate < DateTime.Now)
+                    {
+                        await CurrentWorkDict.TryRemoveAsync(tx, enumerator.Current.Key);
+                    }
                 }
                 await tx.CommitAsync();
             }
 
             return true;
+        }
+
+
+        public async Task<List<CurrentWork>> GetAllHistoricalData()
+        {
+            List<CurrentWork> currentWorks = new List<CurrentWork>();
+
+            CurrentWorkDict = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var enumerator = (await CurrentWorkDict.CreateEnumerableAsync(tx)).GetAsyncEnumerator();
+                while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
+                {
+                    if(enumerator.Current.Value.EndDate < DateTime.Now)
+                    {
+                        currentWorks.Add(enumerator.Current.Value);
+                    }
+                }
+            }
+
+
+            return currentWorks;
         }
     }
 }

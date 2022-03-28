@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkServiceSaver", "WorkSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{D846DA69-C128-4657-99F7-338B5A03DA52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistoryWorkSaver", "HistoryWorkSaver\HistoryWorkSaver.csproj", "{397866CE-22A1-49DD-BBEF-46B2B42A9246}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub", "PubSub\PubSub.csproj", "{276BD0B1-5C70-44C3-8F82-7C948E1441FB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,18 @@ Global
 		{D846DA69-C128-4657-99F7-338B5A03DA52}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D846DA69-C128-4657-99F7-338B5A03DA52}.Release|x64.ActiveCfg = Release|Any CPU
 		{D846DA69-C128-4657-99F7-338B5A03DA52}.Release|x64.Build.0 = Release|Any CPU
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Debug|x64.ActiveCfg = Debug|x64
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Debug|x64.Build.0 = Debug|x64
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Release|Any CPU.ActiveCfg = Release|x64
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Release|x64.ActiveCfg = Release|x64
+		{397866CE-22A1-49DD-BBEF-46B2B42A9246}.Release|x64.Build.0 = Release|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Debug|x64.ActiveCfg = Debug|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Debug|x64.Build.0 = Debug|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Release|Any CPU.ActiveCfg = Release|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Release|x64.ActiveCfg = Release|x64
+		{276BD0B1-5C70-44C3-8F82-7C948E1441FB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

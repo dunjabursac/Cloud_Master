@@ -19,5 +19,8 @@ namespace WorkServiceSaver
 
         [OperationContract]
         Task<bool> DeleteAllActiveData();
+
+        [OperationContract]
+        Task<List<CurrentWork>> GetAllHistoricalData();
     }
 }

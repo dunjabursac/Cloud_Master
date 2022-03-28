@@ -4,12 +4,16 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Fabric;
 using System.Fabric.Description;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace WorkServiceSaver
 {
@@ -66,8 +70,9 @@ namespace WorkServiceSaver
             //       or remove this RunAsync override if it's not needed in your service.
 
             var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
-
             var CurrentWorkActiveData = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+
+            await ReadFromTable();
 
             while (true)
             {
@@ -87,7 +92,76 @@ namespace WorkServiceSaver
                     await tx.CommitAsync();
                 }
 
+                AddToTableStorage();
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            }
+        }
+
+
+        public async Task ReadFromTable()
+        {
+            try
+            {
+                CloudStorageAccount _storageAccount;
+                CloudTable _table;
+                string a = ConfigurationManager.AppSettings["DataConnectionString"];
+                _storageAccount = CloudStorageAccount.Parse(a);
+                CloudTableClient tableClient = new CloudTableClient(new Uri(_storageAccount.TableEndpoint.AbsoluteUri), _storageAccount.Credentials);
+                _table = tableClient.GetTableReference("CurrentWorkDataStorage");
+
+                var results = from g in _table.CreateQuery<CurrentWorkTable>() where g.PartitionKey == "CurrentWorkData" && !g.HistoryData select g;
+
+                if (results.ToList().Count > 0)
+                {
+                    var CurrentWorkActiveData = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+                    using (var tx = this.StateManager.CreateTransaction())
+                    {
+                        foreach (CurrentWorkTable currentWorkEntity in results.ToList())
+                        {
+                            await CurrentWorkActiveData.TryAddAsync(tx, currentWorkEntity.RowKey, new CurrentWork(currentWorkEntity.RowKey, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description));
+                        }
+                        await tx.CommitAsync();
+                    }
+                }
+            }
+            catch
+            {
+                ServiceEventSource.Current.Message("Cloud is NOT created!");
+            }
+        }
+
+        public async Task AddToTableStorage()
+        {
+            List<CurrentWorkTable> currentWorkTableEntities = new List<CurrentWorkTable>();
+            var CurrentWorkActiveData = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var enumerator = (await CurrentWorkActiveData.CreateEnumerableAsync(tx)).GetAsyncEnumerator();
+                while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
+                {
+                    CurrentWork currentWork = (await CurrentWorkActiveData.TryGetValueAsync(tx, enumerator.Current.Key)).Value;
+                    currentWorkTableEntities.Add(new CurrentWorkTable(currentWork.IdCurrentWork, currentWork.Location, currentWork.StartDate, currentWork.EndDate, currentWork.Description, false));
+                }
+            }
+
+            try
+            {
+                CloudStorageAccount _storageAccount;
+                CloudTable _table;
+                string a = ConfigurationManager.AppSettings["DataConnectionString"];
+                _storageAccount = CloudStorageAccount.Parse(a);
+                CloudTableClient tableClient = new CloudTableClient(new Uri(_storageAccount.TableEndpoint.AbsoluteUri), _storageAccount.Credentials);
+                _table = tableClient.GetTableReference("CurrentWorkDataStorage");
+                foreach (CurrentWorkTable currentWorkEntity in currentWorkTableEntities)
+                {
+                    TableOperation insertOperation = TableOperation.InsertOrReplace(currentWorkEntity);
+                    _table.Execute(insertOperation);
+                }
+            }
+            catch
+            {
+                ServiceEventSource.Current.Message("Cloud is NOT created!");
             }
         }
     }
