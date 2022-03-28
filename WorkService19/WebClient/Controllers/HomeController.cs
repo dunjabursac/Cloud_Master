@@ -27,7 +27,7 @@ namespace WebClient.Controllers
         {
             try
             {
-                int x = -1;
+                bool result = true;
                 FabricClient fabricClient = new FabricClient();
                 int partitionsNumber = (await fabricClient.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/WorkServiceSaver"))).Count;
                 var binding = WcfUtility.CreateTcpClientBinding();
@@ -38,15 +38,24 @@ namespace WebClient.Controllers
                         new WcfCommunicationClientFactory<ISaver>(clientBinding: binding),
                         new Uri("fabric:/WorkService19/WorkServiceSaver"),
                         new ServicePartitionKey(index % partitionsNumber));
-                    x = await servicePartitionClient.InvokeWithRetryAsync(client => client.Channel.AddCurrentWork(idCurrentWork, location, startDate, endDate, description));
+                    result = await servicePartitionClient.InvokeWithRetryAsync(client => client.Channel.AddCurrentWork(idCurrentWork, location, startDate, endDate, description));
                     index++;
                 }
-                ViewData["Title"] = "Uspesno dodat nov rad";
+
+                if(result)
+                {
+                    ViewData["Title"] = "New work added successfully!";
+                }
+                else
+                {
+                    ViewData["Title"] = "New work NOT added successfully!";
+                }
+                
                 return View("Index");
             }
             catch
             {
-                ViewData["Title"] = "Nije dodat nov rad";
+                ViewData["Title"] = "New work NOT added successfully!";
                 return View("Index");
             }
 
@@ -83,7 +92,7 @@ namespace WebClient.Controllers
             }
             catch
             {
-                ViewData["Contact"] = "Servis trenutno nije dostupan";
+                ViewData["Contact"] = "Service is currently unavailable!";
                 return View();
             }
         }

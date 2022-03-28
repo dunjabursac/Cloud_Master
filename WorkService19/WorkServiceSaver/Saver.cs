@@ -26,18 +26,21 @@ namespace WorkServiceSaver
         }
 
 
-        public async Task<int> AddCurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description)
+        public async Task<bool> AddCurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description)
         {
+            bool result = true;
+
             CurrentWorkDict = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
             using (var tx = this.StateManager.CreateTransaction())
             {
-                await CurrentWorkDict.TryAddAsync(tx, idCurrentWork, new CurrentWork(idCurrentWork, location, startDate, endDate, description));
+                result = await CurrentWorkDict.TryAddAsync(tx, idCurrentWork, new CurrentWork(idCurrentWork, location, startDate, endDate, description));
                 await tx.CommitAsync();
             }
 
-            return 5;
+            return result;
         }
 
+        
         public async Task<List<CurrentWork>> GetAllData()
         {
             List<CurrentWork> currentWorks = new List<CurrentWork>();
@@ -52,6 +55,23 @@ namespace WorkServiceSaver
             }
 
             return currentWorks;
+        }
+
+
+        public async Task<bool> DeleteAllActiveData()
+        {
+            CurrentWorkDict = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var enumerator = (await CurrentWorkDict.CreateEnumerableAsync(tx)).GetAsyncEnumerator();
+                while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
+                {
+                    await CurrentWorkDict.TryRemoveAsync(tx, enumerator.Current.Key);
+                }
+                await tx.CommitAsync();
+            }
+
+            return true;
         }
     }
 }

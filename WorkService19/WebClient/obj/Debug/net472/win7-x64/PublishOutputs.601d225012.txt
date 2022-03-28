@@ -177,8 +177,13 @@ D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debu
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.DiaSymReader.Native.amd64.dll
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Common.dll
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\WorkServiceSaver.exe
+D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.WindowsAzure.Storage.dll
+D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.Azure.KeyVault.Core.dll
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\WorkServiceSaver.pdb
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\WorkServiceSaver.exe.config
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Common.pdb
+D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.WindowsAzure.Storage.pdb
+D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.WindowsAzure.Storage.xml
+D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\Microsoft.Azure.KeyVault.Core.xml
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\WebClient.Views.dll
 D:\Fakultet\NEpolozeno\dunjabursac\Cloud_Master\WorkService19\WebClient\obj\Debug\net472\win7-x64\PubTmp\Out\WebClient.Views.pdb

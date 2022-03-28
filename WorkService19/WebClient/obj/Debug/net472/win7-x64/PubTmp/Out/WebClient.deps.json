@@ -3410,6 +3410,16 @@
         "runtime": {
           "WorkServiceSaver.exe": {}
         }
+      },
+      "Microsoft.WindowsAzure.Storage/9.3.2.0": {
+        "runtime": {
+          "Microsoft.WindowsAzure.Storage.dll": {}
+        }
+      },
+      "Microsoft.Azure.KeyVault.Core/1.0.0.0": {
+        "runtime": {
+          "Microsoft.Azure.KeyVault.Core.dll": {}
+        }
       }
     }
   },
@@ -4560,6 +4570,16 @@
     },
     "WorkServiceSaver/1.0.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.WindowsAzure.Storage/9.3.2.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Azure.KeyVault.Core/1.0.0.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     },

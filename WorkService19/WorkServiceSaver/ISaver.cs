@@ -12,9 +12,12 @@ namespace WorkServiceSaver
     public interface ISaver
     {
         [OperationContract]
-        Task<int> AddCurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description);
+        Task<bool> AddCurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description);
 
         [OperationContract]
         Task<List<CurrentWork>> GetAllData();
+
+        [OperationContract]
+        Task<bool> DeleteAllActiveData();
     }
 }
