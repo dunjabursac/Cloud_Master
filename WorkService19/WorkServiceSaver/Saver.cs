@@ -52,7 +52,9 @@ namespace WorkServiceSaver
                 token = dataArray[0];
                 weatherDescription = token["description"].ToString();
 
-                temp = Convert.ToDouble(obj["main"]["temp"]);
+                double tempInKelvin = Convert.ToDouble(obj["main"]["temp"]);
+                temp = tempInKelvin - 273.15;
+
                 windSpeed = Convert.ToDouble(obj["wind"]["speed"]);
                 clouds = Convert.ToDouble(obj["clouds"]["all"]);
             }
