@@ -27,6 +27,13 @@ namespace WebClient.Controllers
         [Route("/HomeController/PostData")]
         public async Task<IActionResult> PostData(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description)
         {
+            if(startDate >= endDate)
+            {
+                ViewData["Title"] = "Dates are entered INCORRECTLY!";
+                return View("Index");
+            }
+
+
             try
             {
                 bool result = true;
