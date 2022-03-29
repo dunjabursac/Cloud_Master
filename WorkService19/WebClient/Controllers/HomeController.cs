@@ -1,4 +1,5 @@
 ﻿using Common;
+using HistoryWorkSaver;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Client;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Fabric;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using WebClient.Models;
 using WorkServiceSaver;
@@ -61,11 +63,36 @@ namespace WebClient.Controllers
 
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["About"] = null;
+            List<CurrentWork> currentWorks = new List<CurrentWork>();
 
-            return View();
+            var myBinding = new NetTcpBinding(SecurityMode.None);
+            var myEndpoint = new EndpointAddress("net.tcp://localhost:54675/HistoryWorkSaverEndpoint");
+
+            using (var myChannelFactory = new ChannelFactory<IHistoryService>(myBinding, myEndpoint))
+            {
+                IHistoryService clientService = null;
+                try
+                {
+                    clientService = myChannelFactory.CreateChannel();
+                    currentWorks = clientService.GetAllHistoricalDataFromStorage();
+                    ((ICommunicationObject)clientService).Close();
+                    myChannelFactory.Close();
+
+                    return View(currentWorks);
+                }
+                catch
+                {
+                    (clientService as ICommunicationObject)?.Abort();
+
+                    ViewData["About"] = "Service is currently unavailable!";
+                    return View();
+                }
+
+            }
+
         }
 
         public async Task<IActionResult> Contact()

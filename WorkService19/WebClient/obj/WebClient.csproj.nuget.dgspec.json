@@ -19,6 +19,28 @@
         "net472": {}
       }
     },
+    "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj": {
+      "restore": {
+        "projectUniqueName": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj",
+        "projectName": "HistoryWorkSaver",
+        "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj",
+        "frameworks": {
+          "net472": {
+            "projectReferences": {
+              "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\Common\\Common.csproj": {
+                "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\Common\\Common.csproj"
+              },
+              "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj": {
+                "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
     "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WebClient\\WebClient.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -49,6 +71,9 @@
           "net472": {
             "targetAlias": "net472",
             "projectReferences": {
+              "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj": {
+                "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj"
+              },
               "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj": {
                 "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj"
               }

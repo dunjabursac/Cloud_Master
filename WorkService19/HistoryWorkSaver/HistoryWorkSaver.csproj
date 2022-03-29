@@ -120,6 +120,8 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HistoryService.cs" />
+    <Compile Include="IHistoryService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HistoryWorkSaver.cs" />
     <Compile Include="Program.cs" />

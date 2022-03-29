@@ -2563,6 +2563,19 @@
           "bin/placeholder/Common.dll": {}
         }
       },
+      "HistoryWorkSaver/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Common": "1.0.0",
+          "WorkServiceSaver": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/HistoryWorkSaver.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/HistoryWorkSaver.dll": {}
+        }
+      },
       "WorkServiceSaver/1.0.0": {
         "type": "project",
         "dependencies": {
@@ -4828,6 +4841,19 @@
         },
         "runtime": {
           "bin/placeholder/Common.dll": {}
+        }
+      },
+      "HistoryWorkSaver/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Common": "1.0.0",
+          "WorkServiceSaver": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/HistoryWorkSaver.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/HistoryWorkSaver.dll": {}
         }
       },
       "WorkServiceSaver/1.0.0": {
@@ -9589,6 +9615,11 @@
       "path": "../Common/Common.csproj",
       "msbuildProject": "../Common/Common.csproj"
     },
+    "HistoryWorkSaver/1.0.0": {
+      "type": "project",
+      "path": "../HistoryWorkSaver/HistoryWorkSaver.csproj",
+      "msbuildProject": "../HistoryWorkSaver/HistoryWorkSaver.csproj"
+    },
     "WorkServiceSaver/1.0.0": {
       "type": "project",
       "path": "../WorkServiceSaver/WorkServiceSaver.csproj",
@@ -9597,6 +9628,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.7.2": [
+      "HistoryWorkSaver >= 1.0.0",
       "Microsoft.AspNetCore >= 2.1.7",
       "Microsoft.AspNetCore.CookiePolicy >= 2.1.14",
       "Microsoft.AspNetCore.Mvc >= 2.1.3",
@@ -9643,6 +9675,9 @@
         "net472": {
           "targetAlias": "net472",
           "projectReferences": {
+            "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj": {
+              "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\HistoryWorkSaver\\HistoryWorkSaver.csproj"
+            },
             "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj": {
               "projectPath": "D:\\Fakultet\\NEpolozeno\\dunjabursac\\Cloud_Master\\WorkService19\\WorkServiceSaver\\WorkServiceSaver.csproj"
             }

@@ -1,7 +1,27 @@
-﻿@{
-    ViewData["Title"] = "About";
-}
-<h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
+﻿@model IEnumerable<Common.CurrentWork>
 
-<p>Use this area to provide additional information.</p>
+@if (ViewData["About"] != null)
+{
+<h1 style="color:blue">@ViewData["Title"]</h1>}
+
+<meta http-equiv="refresh" content="4" />
+
+<table class="table table-bordered table-responsive table-hover">
+    <tr>
+        <th>ID </th>
+        <th>Location</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>Description</th>
+    </tr>
+    @foreach (var d in Model)
+    {
+<tr>
+    <td>@d.IdCurrentWork</td>
+    <td>@d.Location</td>
+    <td>@d.StartDate</td>
+    <td>@d.EndDate</td>
+    <td>@d.Description</td>
+</tr>
+}
+</table>

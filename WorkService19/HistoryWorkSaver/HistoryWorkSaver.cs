@@ -4,6 +4,7 @@ using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Communication.Wcf;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Fabric;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +35,28 @@ namespace HistoryWorkSaver
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            return new[] { new ServiceInstanceListener(context => this.CreateInternalListener(context)) };
+        }
+
+
+        private ICommunicationListener CreateInternalListener(StatelessServiceContext context)
+        {
+            string host = context.NodeContext.IPAddressOrFQDN;
+
+            var endpointConfig = context.CodePackageActivationContext.GetEndpoint("HistoryWorkSaverEndpoint");
+            int port = endpointConfig.Port;
+            var scheme = endpointConfig.Protocol.ToString();
+            string uri = string.Format(CultureInfo.InvariantCulture, "net.{0}://{1}:{2}/HistoryWorkSaverEndpoint", scheme, host, port);
+
+            var listener = new WcfCommunicationListener<IHistoryService>(
+                serviceContext: context,
+                wcfServiceObject: new HistoryService(),
+                listenerBinding: WcfUtility.CreateTcpListenerBinding(maxMessageSize: 1024 * 1024 * 1024),
+                address: new System.ServiceModel.EndpointAddress(uri)
+                );
+
+            ServiceEventSource.Current.Message("Listener created!");
+            return listener;
         }
 
         /// <summary>

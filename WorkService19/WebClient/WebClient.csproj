@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HistoryWorkSaver\HistoryWorkSaver.csproj" />
     <ProjectReference Include="..\WorkServiceSaver\WorkServiceSaver.csproj" />
   </ItemGroup>
 
