@@ -14,6 +14,11 @@
         <th>Start date</th>
         <th>End date</th>
         <th>Description</th>
+
+        <th>Weather description</th>
+        <th>Temperature [C]</th>
+        <th>Wind speed [m/s]</th>
+        <th>Clouds [%]</th>
     </tr>
     @foreach (var d in Model)
     {
@@ -23,6 +28,11 @@
             <td>@d.StartDate</td>
             <td>@d.EndDate</td>
             <td>@d.Description</td>
+
+            <td>@d.WeatherDescription</td>
+            <td>@d.Temp</td>
+            <td>@d.WindSpeed</td>
+            <td>@d.Clouds</td>
         </tr>
     }
 </table>
