@@ -118,7 +118,7 @@ namespace WorkServiceSaver
                     {
                         foreach (CurrentWorkTable currentWorkEntity in results.ToList())
                         {
-                            await CurrentWorkActiveData.TryAddAsync(tx, currentWorkEntity.RowKey, new CurrentWork(currentWorkEntity.RowKey, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description));
+                            await CurrentWorkActiveData.TryAddAsync(tx, currentWorkEntity.RowKey, new CurrentWork(currentWorkEntity.RowKey, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description, currentWorkEntity.WeatherDescription, currentWorkEntity.Temp, currentWorkEntity.WindSpeed, currentWorkEntity.Clouds));
                         }
                         await tx.CommitAsync();
                     }
@@ -141,7 +141,7 @@ namespace WorkServiceSaver
                 while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
                 {
                     CurrentWork currentWork = (await CurrentWorkActiveData.TryGetValueAsync(tx, enumerator.Current.Key)).Value;
-                    currentWorkTableEntities.Add(new CurrentWorkTable(currentWork.IdCurrentWork, currentWork.Location, currentWork.StartDate, currentWork.EndDate, currentWork.Description, false));
+                    currentWorkTableEntities.Add(new CurrentWorkTable(currentWork.IdCurrentWork, currentWork.Location, currentWork.StartDate, currentWork.EndDate, currentWork.Description, false, currentWork.WeatherDescription, currentWork.Temp, currentWork.WindSpeed, currentWork.Clouds));
                 }
             }
 

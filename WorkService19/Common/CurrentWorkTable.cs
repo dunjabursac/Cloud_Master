@@ -14,7 +14,7 @@ namespace Common
 
         }
 
-        public CurrentWorkTable(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description, bool historyData)
+        public CurrentWorkTable(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description, bool historyData, string weatherDescription, double temp, double windSpeed, double clouds)
         {
             RowKey = idCurrentWork;
             PartitionKey = "CurrentWorkData";
@@ -26,6 +26,11 @@ namespace Common
             Description = description;
 
             HistoryData = historyData;
+
+            WeatherDescription = weatherDescription;
+            Temp = temp;
+            WindSpeed = windSpeed;
+            Clouds = clouds;
         }
 
         public string IdCurrentWork { get; set; }
@@ -34,5 +39,11 @@ namespace Common
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
         public bool HistoryData { get; set; }
+
+
+        public string WeatherDescription { get; set; }
+        public double Temp { get; set; }
+        public double WindSpeed { get; set; }
+        public double Clouds { get; set; }
     }
 }

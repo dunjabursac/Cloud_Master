@@ -13,13 +13,18 @@ namespace Common
 
         }
 
-        public CurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description)
+        public CurrentWork(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description, string weatherDescription, double temp, double windSpeed, double clouds)
         {
             IdCurrentWork = idCurrentWork;
             Location = location;
             StartDate = startDate;
             EndDate = endDate;
             Description = description;
+
+            WeatherDescription = weatherDescription;
+            Temp = temp;
+            WindSpeed = windSpeed;
+            Clouds = clouds;
         }
 
         public string IdCurrentWork { get; set; }
@@ -27,5 +32,12 @@ namespace Common
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Description { get; set; }
+
+
+        public string WeatherDescription { get; set; }
+        public double Temp { get; set; }
+        public double WindSpeed { get; set; }
+        public double Clouds { get; set; }
+
     }
 }

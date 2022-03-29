@@ -119,7 +119,7 @@ namespace HistoryWorkSaver
                     _table = tableClient.GetTableReference("CurrentWorkDataStorage");
                     foreach (CurrentWork currentWork in currentWorks)
                     {
-                        CurrentWorkTable currentWorkTable = new CurrentWorkTable(currentWork.IdCurrentWork, currentWork.Location, currentWork.StartDate, currentWork.EndDate, currentWork.Description, true);
+                        CurrentWorkTable currentWorkTable = new CurrentWorkTable(currentWork.IdCurrentWork, currentWork.Location, currentWork.StartDate, currentWork.EndDate, currentWork.Description, true, currentWork.WeatherDescription, currentWork.Temp, currentWork.WindSpeed, currentWork.Clouds);
                         TableOperation insertOperation = TableOperation.InsertOrReplace(currentWorkTable);
                         _table.Execute(insertOperation);
                     }

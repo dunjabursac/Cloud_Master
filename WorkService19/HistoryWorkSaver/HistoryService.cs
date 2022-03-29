@@ -29,7 +29,7 @@ namespace HistoryWorkSaver
             var results = from g in _table.CreateQuery<CurrentWorkTable>() where g.PartitionKey == "CurrentWorkData" && g.HistoryData select g;
             foreach (CurrentWorkTable currentWorkEntity in results.ToList())
             {
-                currentWorks.Add(new CurrentWork(currentWorkEntity.IdCurrentWork, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description));
+                currentWorks.Add(new CurrentWork(currentWorkEntity.IdCurrentWork, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description, currentWorkEntity.WeatherDescription, currentWorkEntity.Temp, currentWorkEntity.WindSpeed, currentWorkEntity.Clouds));
             }
             return currentWorks;
         }
