@@ -11,7 +11,13 @@ namespace Common
     public interface IPubSubService
     {
         [OperationContract]
+        Task<bool> PublishActive(List<CurrentWork> currentWorks);
+        [OperationContract]
         Task<bool> PublishHistory(List<CurrentWork> currentWorks);
+        [OperationContract]
+        Task<List<CurrentWork>> GetHistoryData();
+        [OperationContract]
+        Task<List<CurrentWork>> GetActiveData();
 
     }
 }

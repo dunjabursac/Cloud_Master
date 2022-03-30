@@ -1,9 +1,13 @@
-﻿using Microsoft.ServiceFabric.Data.Collections;
+﻿using Common;
+using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,9 +19,13 @@ namespace PubSub
     /// </summary>
     internal sealed class PubSub : StatefulService
     {
+        PubSubService pubSubService;
+
         public PubSub(StatefulServiceContext context)
             : base(context)
-        { }
+        {
+            pubSubService = new PubSubService(this.StateManager);
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
@@ -28,7 +36,24 @@ namespace PubSub
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
-            return new ServiceReplicaListener[0];
+            return new[] { new ServiceReplicaListener(context => this.CreateInternalListener(context)) };
+        }
+
+        private ICommunicationListener CreateInternalListener(ServiceContext context)
+        {
+            EndpointResourceDescription internalEndpoint = context.CodePackageActivationContext.GetEndpoint("ProcessingServiceEndpoint");
+            string uriPrefix = String.Format(
+                   "{0}://+:{1}/{2}/{3}-{4}/",
+                   internalEndpoint.Protocol,
+                   internalEndpoint.Port,
+                   context.PartitionId,
+                   context.ReplicaOrInstanceId,
+                   Guid.NewGuid());
+
+            string nodeIP = FabricRuntime.GetNodeContext().IPAddressOrFQDN;
+
+            string uriPublished = uriPrefix.Replace("+", nodeIP);
+            return new WcfCommunicationListener<IPubSubService>(context, pubSubService, WcfUtility.CreateTcpListenerBinding(), uriPrefix);
         }
 
         /// <summary>
@@ -42,6 +67,9 @@ namespace PubSub
             //       or remove this RunAsync override if it's not needed in your service.
 
             var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
+
+            var ActiveData = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("ActiveData");
+            var HistoryData = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("HistoryData");
 
             while (true)
             {

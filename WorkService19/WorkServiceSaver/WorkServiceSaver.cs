@@ -14,6 +14,9 @@ using System.Fabric.Description;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Client;
+using Microsoft.ServiceFabric.Services.Communication.Client;
+using Microsoft.ServiceFabric.Services.Client;
 
 namespace WorkServiceSaver
 {
@@ -74,6 +77,9 @@ namespace WorkServiceSaver
 
             await ReadFromTable();
 
+            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            await SendDataToBroker(cancellationToken);
+
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -93,6 +99,8 @@ namespace WorkServiceSaver
                 }
 
                 AddToTableStorage();
+
+
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
@@ -162,6 +170,49 @@ namespace WorkServiceSaver
             catch
             {
                 ServiceEventSource.Current.Message("Cloud is NOT created!");
+            }
+        }
+
+
+
+
+        public async Task SendDataToBroker(CancellationToken cancellationToken)
+        {
+            try
+            {
+                bool tempPublish = false;
+                List<CurrentWork> currentWorks = new List<CurrentWork>();
+                var CurrentWorkDict = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, CurrentWork>>("CurrentWorkActiveData");
+                using (var tx = this.StateManager.CreateTransaction())
+                {
+                    var enumerator = (await CurrentWorkDict.CreateEnumerableAsync(tx)).GetAsyncEnumerator();
+                    while (await enumerator.MoveNextAsync(new System.Threading.CancellationToken()))
+                    {
+                        currentWorks.Add(enumerator.Current.Value);
+                    }
+                }
+                FabricClient fabricClient1 = new FabricClient();
+                int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
+                var binding1 = WcfUtility.CreateTcpClientBinding();
+                int index1 = 0;
+                for (int i = 0; i < partitionsNumber1; i++)
+                {
+                    ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
+                        new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
+                        new Uri("fabric:/WorkService19/PubSub"),
+                        new ServicePartitionKey(index1 % partitionsNumber1));
+                    while (!tempPublish)
+                    {
+                        tempPublish = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.PublishActive(currentWorks));
+                        await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                    }
+                    index1++;
+                }
+            }
+            catch (Exception e)
+            {
+                string err = e.Message;
+                ServiceEventSource.Current.Message(err);
             }
         }
     }

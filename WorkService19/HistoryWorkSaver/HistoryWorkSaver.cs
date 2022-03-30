@@ -69,8 +69,9 @@ namespace HistoryWorkSaver
             //       or remove this RunAsync override if it's not needed in your service.
 
 
+            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+            await SendDataToBroker(cancellationToken);
             await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
-
 
             long iterations = 0;
 
@@ -136,20 +137,20 @@ namespace HistoryWorkSaver
 
 
 
-                    //List<CurrentWork> historyData = GetAllHistoricalData();
-                    //FabricClient fabricClient1 = new FabricClient();
-                    //int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
-                    //var binding1 = WcfUtility.CreateTcpClientBinding();
-                    //int index1 = 0;
-                    //for (int i = 0; i < partitionsNumber1; i++)
-                    //{
-                    //    ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
-                    //        new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
-                    //        new Uri("fabric:/CloudProjekatSistemUcitavanjaElektricnogBrojila/Broker"),
-                    //        new ServicePartitionKey(index1 % partitionsNumber1));
-                    //    bool tempPublish = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.PublishHistory(historyData));
-                    //    index1++;
-                    //}
+                    List<CurrentWork> historyData = GetAllHistoricalData();
+                    FabricClient fabricClient1 = new FabricClient();
+                    int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
+                    var binding1 = WcfUtility.CreateTcpClientBinding();
+                    int index1 = 0;
+                    for (int i = 0; i < partitionsNumber1; i++)
+                    {
+                        ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
+                            new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
+                            new Uri("fabric:/WorkService19/PubSub"),
+                            new ServicePartitionKey(index1 % partitionsNumber1));
+                        bool tempPublish = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.PublishHistory(historyData));
+                        index1++;
+                    }
 
                 }
                 catch
@@ -161,7 +162,62 @@ namespace HistoryWorkSaver
         }
 
 
+        public List<CurrentWork> GetAllHistoricalData()
+        {
+            List<CurrentWork> currentWorks = new List<CurrentWork>();
+            try
+            {
+                CloudStorageAccount _storageAccount;
+                CloudTable _table;
+                string a = ConfigurationManager.AppSettings["DataConnectionString"];
+                _storageAccount = CloudStorageAccount.Parse(a);
+                CloudTableClient tableClient = new CloudTableClient(new Uri(_storageAccount.TableEndpoint.AbsoluteUri), _storageAccount.Credentials);
+                _table = tableClient.GetTableReference("CurrentWorkDataStorage");
+                var results = from g in _table.CreateQuery<CurrentWorkTable>() where g.PartitionKey == "CurrentWorkData" && g.HistoryData select g;
+                foreach (CurrentWorkTable currentWorkEntity in results.ToList())
+                {
+                    currentWorks.Add(new CurrentWork(currentWorkEntity.RowKey, currentWorkEntity.Location, currentWorkEntity.StartDate, currentWorkEntity.EndDate, currentWorkEntity.Description, currentWorkEntity.WeatherDescription, currentWorkEntity.Temp, currentWorkEntity.WindSpeed, currentWorkEntity.Clouds));
+                }
+            }
+            catch (Exception e)
+            {
+                string err = e.Message;
+                ServiceEventSource.Current.Message(err);
+            }
+            return currentWorks;
+        }
 
-        
+
+        public async Task SendDataToBroker(CancellationToken cancellationToken)
+        {
+            try
+            {
+                bool tempPublish = false;
+                List<CurrentWork> currentWorks = GetAllHistoricalData();
+                FabricClient fabricClient1 = new FabricClient();
+                int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
+                var binding1 = WcfUtility.CreateTcpClientBinding();
+                int index1 = 0;
+                for (int i = 0; i < partitionsNumber1; i++)
+                {
+                    ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
+                        new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
+                        new Uri("fabric:/WorkService19/PubSub"),
+                        new ServicePartitionKey(index1 % partitionsNumber1));
+                    while (!tempPublish)
+                    {
+                        tempPublish = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.PublishHistory(currentWorks));
+                        await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                    }
+                    index1++;
+                }
+            }
+            catch (Exception e)
+            {
+                string err = e.Message;
+                ServiceEventSource.Current.Message(err);
+            }
+
+        }
     }
 }

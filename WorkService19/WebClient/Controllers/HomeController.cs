@@ -27,7 +27,7 @@ namespace WebClient.Controllers
         [Route("/HomeController/PostData")]
         public async Task<IActionResult> PostData(string idCurrentWork, string location, DateTime startDate, DateTime endDate, string description)
         {
-            if(startDate >= endDate)
+            if (startDate >= endDate)
             {
                 ViewData["Title"] = "Dates are entered INCORRECTLY!";
                 return View("Index");
@@ -75,29 +75,53 @@ namespace WebClient.Controllers
             ViewData["About"] = null;
             List<CurrentWork> currentWorks = new List<CurrentWork>();
 
-            var myBinding = new NetTcpBinding(SecurityMode.None);
-            var myEndpoint = new EndpointAddress("net.tcp://localhost:54675/HistoryWorkSaverEndpoint");
+            //var myBinding = new NetTcpBinding(SecurityMode.None);
+            //var myEndpoint = new EndpointAddress("net.tcp://localhost:54675/HistoryWorkSaverEndpoint");
 
-            using (var myChannelFactory = new ChannelFactory<IHistoryService>(myBinding, myEndpoint))
+            //using (var myChannelFactory = new ChannelFactory<IHistoryService>(myBinding, myEndpoint))
+            //{
+            //    IHistoryService clientService = null;
+            //    try
+            //    {
+            //        clientService = myChannelFactory.CreateChannel();
+            //        currentWorks = clientService.GetAllHistoricalDataFromStorage();
+            //        ((ICommunicationObject)clientService).Close();
+            //        myChannelFactory.Close();
+
+            //        return View(currentWorks);
+            //    }
+            //    catch
+            //    {
+            //        (clientService as ICommunicationObject)?.Abort();
+
+            //        ViewData["About"] = "Service is currently unavailable!";
+            //        return View();
+            //    }
+
+            //}
+
+
+            try
             {
-                IHistoryService clientService = null;
-                try
+                FabricClient fabricClient1 = new FabricClient();
+                int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
+                var binding1 = WcfUtility.CreateTcpClientBinding();
+                int index1 = 0;
+                for (int i = 0; i < partitionsNumber1; i++)
                 {
-                    clientService = myChannelFactory.CreateChannel();
-                    currentWorks = clientService.GetAllHistoricalDataFromStorage();
-                    ((ICommunicationObject)clientService).Close();
-                    myChannelFactory.Close();
-
-                    return View(currentWorks);
+                    ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
+                        new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
+                        new Uri("fabric:/WorkService19/PubSub"),
+                        new ServicePartitionKey(index1 % partitionsNumber1));
+                    currentWorks = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.GetHistoryData());
+                    index1++;
                 }
-                catch
-                {
-                    (clientService as ICommunicationObject)?.Abort();
-
-                    ViewData["About"] = "Service is currently unavailable!";
-                    return View();
-                }
-
+                return View(currentWorks);
+            }
+            catch
+            {
+                ViewData["About"] = "Service is currently unavailable!";
+                return View();
             }
 
         }
@@ -107,19 +131,44 @@ namespace WebClient.Controllers
             ViewData["Contact"] = null;
             List<CurrentWork> currentWorks = new List<CurrentWork>();
 
+            //try
+            //{
+            //    FabricClient fabricClient1 = new FabricClient();
+            //    int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/WorkServiceSaver"))).Count;
+            //    var binding1 = WcfUtility.CreateTcpClientBinding();
+            //    int index1 = 0;
+            //    for (int i = 0; i < partitionsNumber1; i++)
+            //    {
+            //        ServicePartitionClient<WcfCommunicationClient<ISaver>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<ISaver>>(
+            //            new WcfCommunicationClientFactory<ISaver>(clientBinding: binding1),
+            //            new Uri("fabric:/WorkService19/WorkServiceSaver"),
+            //            new ServicePartitionKey(index1 % partitionsNumber1));
+            //        currentWorks = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.GetAllData());
+            //        index1++;
+            //    }
+            //    return View(currentWorks);
+            //}
+            //catch
+            //{
+            //    ViewData["Contact"] = "Service is currently unavailable!";
+            //    return View();
+            //}
+
+
             try
             {
                 FabricClient fabricClient1 = new FabricClient();
-                int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/WorkServiceSaver"))).Count;
+                int partitionsNumber1 = (await fabricClient1.QueryManager.GetPartitionListAsync(new Uri("fabric:/WorkService19/PubSub"))).Count;
                 var binding1 = WcfUtility.CreateTcpClientBinding();
                 int index1 = 0;
                 for (int i = 0; i < partitionsNumber1; i++)
                 {
-                    ServicePartitionClient<WcfCommunicationClient<ISaver>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<ISaver>>(
-                        new WcfCommunicationClientFactory<ISaver>(clientBinding: binding1),
-                        new Uri("fabric:/WorkService19/WorkServiceSaver"),
+                    ServicePartitionClient<WcfCommunicationClient<IPubSubService>> servicePartitionClient1 = new ServicePartitionClient<WcfCommunicationClient<IPubSubService>>(
+                        new WcfCommunicationClientFactory<IPubSubService>(clientBinding: binding1),
+                        new Uri("fabric:/WorkService19/PubSub"),
                         new ServicePartitionKey(index1 % partitionsNumber1));
-                    currentWorks = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.GetAllData());
+                    currentWorks = await servicePartitionClient1.InvokeWithRetryAsync(client => client.Channel.GetActiveData());
+
                     index1++;
                 }
                 return View(currentWorks);
